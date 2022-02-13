@@ -165,7 +165,7 @@ public class Chess {
 							whitePawnSpots[0]=true;
 						if (blackPawn[j][0]==whitePawn[i][0]+whitePawnMoves[2][0]&&blackPawn[j][1]==whitePawn[i][1]+whitePawnMoves[2][1])
 							whitePawnSpots[2]=true;
-						if (blackPawn[j][0]==whitePawn[i][0]+whitePawnMoves[1][0]&&blackPawn[j][1]==whitePawn[i][1]+whitePawnMoves[1][1])
+						if (blackPawn[j][0]==whitePawn[i][0]+whitePawnMoves[1][0]&&blackPawn[j][1]==whitePawn[i][1]+whitePawnMoves[1][1]||whitePawn[i][1]+whitePawnMoves[1][1]<0)
 							whitePawnSpots[1]=false;
 						if (blackPawn[j][0]==whitePawn[i][0]+whitePawnMoves[3][0]&&blackPawn[j][1]==whitePawn[i][1]+whitePawnMoves[3][1])
 							whitePawnSpots[3]=false;
@@ -175,7 +175,7 @@ public class Chess {
 							whitePawnSpots[0]=true;
 						if (blackKnight[j][0]==whitePawn[i][0]+whitePawnMoves[2][0]&&blackKnight[j][1]==whitePawn[i][1]+whitePawnMoves[2][1])
 							whitePawnSpots[2]=true;
-						if (blackKnight[j][0]==whitePawn[i][0]+whitePawnMoves[1][0]&&blackKnight[j][1]==whitePawn[i][1]+whitePawnMoves[1][1])
+						if (blackKnight[j][0]==whitePawn[i][0]+whitePawnMoves[1][0]&&blackKnight[j][1]==whitePawn[i][1]+whitePawnMoves[1][1]||whitePawn[i][1]+whitePawnMoves[1][1]<0)
 							whitePawnSpots[1]=false;
 						if (blackKnight[j][0]==whitePawn[i][0]+whitePawnMoves[3][0]&&blackKnight[j][1]==whitePawn[i][1]+whitePawnMoves[3][1])
 						whitePawnSpots[3]=false;
@@ -250,7 +250,7 @@ public class Chess {
 							blackPawnSpots[0]=true;
 						if (whitePawn[j][0]==blackPawn[i][0]+blackPawnMoves[2][0]&&whitePawn[j][1]==blackPawn[i][1]+blackPawnMoves[2][1])
 							blackPawnSpots[2]=true;
-						if (whitePawn[j][0]==blackPawn[i][0]+blackPawnMoves[1][0]&&whitePawn[j][1]==blackPawn[i][1]+blackPawnMoves[1][1])
+						if (whitePawn[j][0]==blackPawn[i][0]+blackPawnMoves[1][0]&&whitePawn[j][1]==blackPawn[i][1]+blackPawnMoves[1][1]||blackPawn[i][1]+blackPawnMoves[1][1]>=height)
 							blackPawnSpots[1]=false;
 						if (whitePawn[j][0]==blackPawn[i][0]+blackPawnMoves[3][0]&&whitePawn[j][1]==blackPawn[i][1]+blackPawnMoves[3][1])
 							blackPawnSpots[3]=false;
@@ -260,7 +260,7 @@ public class Chess {
 							blackPawnSpots[0]=true;
 						if (whiteKnight[j][0]==blackPawn[i][0]+blackPawnMoves[2][0]&&whiteKnight[j][1]==blackPawn[i][1]+blackPawnMoves[2][1])
 							blackPawnSpots[2]=true;
-						if (whiteKnight[j][0]==blackPawn[i][0]+blackPawnMoves[1][0]&&whiteKnight[j][1]==blackPawn[i][1]+blackPawnMoves[1][1])
+						if (whiteKnight[j][0]==blackPawn[i][0]+blackPawnMoves[1][0]&&whiteKnight[j][1]==blackPawn[i][1]+blackPawnMoves[1][1]||blackPawn[i][1]+blackPawnMoves[1][1]>=height)
 							blackPawnSpots[1]=false;
 						if (whiteKnight[j][0]==blackPawn[i][0]+blackPawnMoves[3][0]&&whiteKnight[j][1]==blackPawn[i][1]+blackPawnMoves[3][1])
 							blackPawnSpots[3]=false;
