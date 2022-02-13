@@ -1,8 +1,8 @@
-package Chess;
+package Test;
 
 import java.util.Arrays;
 
-public class Chess {
+public class ChessTest {
 	
 	private int[][] whitePawn=new int[8][2], blackPawn=new int[8][2],
 			whiteKnight=new int[2][2], blackKnight=new int[2][2],
@@ -27,7 +27,7 @@ public class Chess {
 	}
 	
 	public static void main(String[] args) {
-		Chess run=new Chess();
+		ChessTest run=new ChessTest();
 		run.set();
 	}
 }
