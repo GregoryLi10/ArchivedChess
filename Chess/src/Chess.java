@@ -37,7 +37,19 @@ public class Chess {
 			whiteQueen=new int[1][2], blackQueen=new int[1][2],
 			whiteKing=new int[1][2], blackKing=new int[1][2];
 	
-	private int[][] whiteKnightMoves={
+	private int[][] whitePawnMoves={
+				{-width/len, -height/len},
+				{0, -height/len},
+				{width/len, -height/len},
+				{0, -2*height/len}},
+			
+			blackPawnMoves={
+				{-width/len, height/len},
+				{0, height/len},
+				{width/len, height/len},
+				{0, 2*height/len}},
+			
+			whiteKnightMoves={
 				{-2*width/len, -height/len},
 				{-width/len, -2*height/len},
 				{width/len, -2*height/len},
@@ -60,7 +72,8 @@ public class Chess {
 	
 	private boolean[] whitePawnClicked=new boolean[8], blackPawnClicked=new boolean[8],
 			whiteKnightClicked=new boolean[2], blackKnightClicked=new boolean[2];
-	private boolean[] whiteKnightSpots=new boolean[8], blackKnightSpots=new boolean[8];
+	
+	private boolean[] whitePawnSpots=new boolean[4], blackPawnSpots=new boolean[4], whiteKnightSpots=new boolean[8], blackKnightSpots=new boolean[8];
 	
 //	private ArrayList<int[]> whiteKnightMoves=new ArrayList<int[]>();
 	
@@ -97,25 +110,27 @@ public class Chess {
 			g.drawImage(whitePawnImg, whitePawn[i][0], whitePawn[i][1], width/len, height/len, null);
 			if (!turn) continue;
 			if (whitePawnClicked[i]){
-				g.fillOval(whitePawn[i][0]+width/len*3/8, whitePawn[i][1]-height/len*5/8, width/len/4, height/len/4);
-				if (whitePawn[i][1]==6*height/len)
-					g.fillOval(whitePawn[i][0]+width/len*3/8, whitePawn[i][1]-height/len*5/8-height/len, width/len/4, height/len/4);
+				for (int j=0; j<whitePawnMoves.length; j++) {
+					if (!whitePawnSpots[j]) continue;
+					g.fillOval(whitePawn[i][0]+whitePawnMoves[j][0]+width/len*3/8, whitePawn[i][1]+whitePawnMoves[j][1]+height/len*3/8, width/len/4, height/len/4);
+				}
 			}
-			
 		}
 		
 		for (int i=0; i<blackPawn.length; i++) {
 			g.drawImage(blackPawnImg, blackPawn[i][0], blackPawn[i][1], width/len, height/len, null);
 			if (turn) continue;
-			if (blackPawnClicked[i]) {
-				g.fillOval(blackPawn[i][0]+width/len*3/8, blackPawn[i][1]+height/len*3/8+height/len, width/len/4, height/len/4);
-				if (blackPawn[i][1]==height/len)
-					g.fillOval(blackPawn[i][0]+width/len*3/8, blackPawn[i][1]+height/len*3/8+2*height/len, width/len/4, height/len/4);
+			if (blackPawnClicked[i]){
+				for (int j=0; j<blackPawnMoves.length; j++) {
+					if (!blackPawnSpots[j]) continue;
+					g.fillOval(blackPawn[i][0]+blackPawnMoves[j][0]+width/len*3/8, blackPawn[i][1]+blackPawnMoves[j][1]+height/len*3/8, width/len/4, height/len/4);
+				}
 			}
 		}
 		
 		for (int i=0; i<whiteKnight.length; i++) {
 			g.drawImage(whiteKnightImg, whiteKnight[i][0], whiteKnight[i][1], width/len, height/len, null);
+			if (!turn) continue;
 			if (whiteKnightClicked[i]) {
 				for (int j=0; j<whiteKnightMoves.length; j++) {
 					if (whiteKnightSpots[j])
@@ -126,6 +141,7 @@ public class Chess {
 		
 		for (int i=0; i<blackKnight.length; i++) {
 			g.drawImage(blackKnightImg, blackKnight[i][0], blackKnight[i][1], width/len, height/len, null);
+			if (turn) continue;
 			if (blackKnightClicked[i]) {
 				for (int j=0; j<blackKnightMoves.length; j++) {
 					if (blackKnightSpots[j])
@@ -137,24 +153,48 @@ public class Chess {
 	
 	public void click(int mouseX, int mouseY) {
 		if (turn) { //white to move
-			for (int i=0; i<len; i++) {
+			for (int i=0; i<whitePawn.length; i++) {
 				if (mouseX>whitePawn[i][0]&&mouseX<whitePawn[i][0]+width/len&&mouseY>whitePawn[i][1]&&mouseY<whitePawn[i][1]+height/len) {
 					whitePawnClicked=new boolean[whitePawnClicked.length];
 					whiteKnightClicked=new boolean[whiteKnightClicked.length];
+					whitePawnSpots=new boolean[whitePawnSpots.length];
+					whitePawnSpots[1]=true;
+					if (whitePawn[i][1]==6*height/len) whitePawnSpots[3]=true;
+					for (int j=0; j<blackPawn.length; j++) {
+						if (blackPawn[j][0]==whitePawn[i][0]+whitePawnMoves[0][0]&&blackPawn[j][1]==whitePawn[i][1]+whitePawnMoves[0][1])
+							whitePawnSpots[0]=true;
+						if (blackPawn[j][0]==whitePawn[i][0]+whitePawnMoves[2][0]&&blackPawn[j][1]==whitePawn[i][1]+whitePawnMoves[2][1])
+							whitePawnSpots[2]=true;
+						if (blackPawn[j][0]==whitePawn[i][0]+whitePawnMoves[1][0]&&blackPawn[j][1]==whitePawn[i][1]+whitePawnMoves[1][1])
+							whitePawnSpots[1]=false;
+						if (blackPawn[j][0]==whitePawn[i][0]+whitePawnMoves[3][0]&&blackPawn[j][1]==whitePawn[i][1]+whitePawnMoves[3][1])
+							whitePawnSpots[3]=false;
+					}
+					for (int j=0; j<blackKnight.length; j++) {
+						if (blackKnight[j][0]==whitePawn[i][0]+whitePawnMoves[0][0]&&blackKnight[j][1]==whitePawn[i][1]+whitePawnMoves[0][1])
+							whitePawnSpots[0]=true;
+						if (blackKnight[j][0]==whitePawn[i][0]+whitePawnMoves[2][0]&&blackKnight[j][1]==whitePawn[i][1]+whitePawnMoves[2][1])
+							whitePawnSpots[2]=true;
+						if (blackKnight[j][0]==whitePawn[i][0]+whitePawnMoves[1][0]&&blackKnight[j][1]==whitePawn[i][1]+whitePawnMoves[1][1])
+							whitePawnSpots[1]=false;
+						if (blackKnight[j][0]==whitePawn[i][0]+whitePawnMoves[3][0]&&blackKnight[j][1]==whitePawn[i][1]+whitePawnMoves[3][1])
+						whitePawnSpots[3]=false;
+					}
+					
 					whitePawnClicked[i]=true;
 					break;
 				}
-				else if (whitePawnClicked[i]&&mouseX>whitePawn[i][0]&&mouseX<whitePawn[i][0]+width/len&&mouseY>whitePawn[i][1]-height/len&&mouseY<whitePawn[i][1]) {
-					whitePawn[i][1]-=height/len;
-					whitePawnClicked=new boolean[whitePawnClicked.length];
-					whiteKnightClicked=new boolean[whiteKnightClicked.length];
-					turn=!turn;
-				}
-				else if (whitePawnClicked[i]&&whitePawn[i][1]==6*height/len&&mouseX>whitePawn[i][0]&&mouseX<whitePawn[i][0]+width/len&&mouseY>whitePawn[i][1]-2*height/len&&mouseY<whitePawn[i][1]-height/len) {
-					whitePawn[i][1]-=2*height/len;
-					whitePawnClicked=new boolean[whitePawnClicked.length];
-					whiteKnightClicked=new boolean[whiteKnightClicked.length];
-					turn=!turn;
+				else if (whitePawnClicked[i]) {
+					for (int j=0; j<whitePawnMoves.length; j++) {
+						if (whitePawnSpots[j]&&mouseX>whitePawn[i][0]+whitePawnMoves[j][0]&&mouseX<whitePawn[i][0]+whitePawnMoves[j][0]+width/len&&mouseY>whitePawn[i][1]+whitePawnMoves[j][1]&&mouseY<whitePawn[i][1]+whitePawnMoves[j][1]+height/len) {
+							whitePawn[i][0]+=whitePawnMoves[j][0];
+							whitePawn[i][1]+=whitePawnMoves[j][1];
+							whitePawnClicked=new boolean[whitePawnClicked.length];
+							whiteKnightClicked=new boolean[whiteKnightClicked.length];
+							turn=!turn;
+							break;
+						}
+					}
 				}
 			}
 			
@@ -198,20 +238,47 @@ public class Chess {
 		}
 		
 		else { //black to move
-			for (int i=0; i<whitePawn.length; i++) {
+			for (int i=0; i<blackPawn.length; i++) {
 				if (mouseX>blackPawn[i][0]&&mouseX<blackPawn[i][0]+width/len&&mouseY>blackPawn[i][1]&&mouseY<blackPawn[i][1]+height/len) {
 					blackPawnClicked=new boolean[blackPawnClicked.length];
+					whiteKnightClicked=new boolean[whiteKnightClicked.length];
+					blackPawnSpots=new boolean[blackPawnSpots.length];
+					blackPawnSpots[1]=true;
+					if (blackPawn[i][1]==height/len) blackPawnSpots[3]=true;
+					for (int j=0; j<whitePawn.length; j++) {
+						if (whitePawn[j][0]==blackPawn[i][0]+blackPawnMoves[0][0]&&whitePawn[j][1]==blackPawn[i][1]+blackPawnMoves[0][1])
+							blackPawnSpots[0]=true;
+						if (whitePawn[j][0]==blackPawn[i][0]+blackPawnMoves[2][0]&&whitePawn[j][1]==blackPawn[i][1]+blackPawnMoves[2][1])
+							blackPawnSpots[2]=true;
+						if (whitePawn[j][0]==blackPawn[i][0]+blackPawnMoves[1][0]&&whitePawn[j][1]==blackPawn[i][1]+blackPawnMoves[1][1])
+							blackPawnSpots[1]=false;
+						if (whitePawn[j][0]==blackPawn[i][0]+blackPawnMoves[3][0]&&whitePawn[j][1]==blackPawn[i][1]+blackPawnMoves[3][1])
+							blackPawnSpots[3]=false;
+					}
+					for (int j=0; j<whiteKnight.length; j++) {
+						if (whiteKnight[j][0]==blackPawn[i][0]+blackPawnMoves[0][0]&&whiteKnight[j][1]==blackPawn[i][1]+blackPawnMoves[0][1])
+							blackPawnSpots[0]=true;
+						if (whiteKnight[j][0]==blackPawn[i][0]+blackPawnMoves[2][0]&&whiteKnight[j][1]==blackPawn[i][1]+blackPawnMoves[2][1])
+							blackPawnSpots[2]=true;
+						if (whiteKnight[j][0]==blackPawn[i][0]+blackPawnMoves[1][0]&&whiteKnight[j][1]==blackPawn[i][1]+blackPawnMoves[1][1])
+							blackPawnSpots[1]=false;
+						if (whiteKnight[j][0]==blackPawn[i][0]+blackPawnMoves[3][0]&&whiteKnight[j][1]==blackPawn[i][1]+blackPawnMoves[3][1])
+							blackPawnSpots[3]=false;
+					}
 					blackPawnClicked[i]=true;
+					break;
 				}
-				else if (blackPawnClicked[i]&&mouseX>blackPawn[i][0]&&mouseX<blackPawn[i][0]+width/len&&mouseY<blackPawn[i][1]+2*height/len&&mouseY>blackPawn[i][1]+height/len) {
-					blackPawn[i][1]+=height/len;
-					blackPawnClicked=new boolean[blackPawnClicked.length];
-					turn=!turn;
-				}
-				else if (blackPawnClicked[i]&&blackPawn[i][1]==height/len&&mouseX>blackPawn[i][0]&&mouseX<blackPawn[i][0]+width/len&&mouseY<blackPawn[i][1]+3*height/len&&mouseY>blackPawn[i][1]+2*height/len) {
-					blackPawn[i][1]+=2*height/len;
-					blackPawnClicked=new boolean[blackPawnClicked.length];
-					turn=!turn;
+				else if (blackPawnClicked[i]) {
+					for (int j=0; j<blackPawnMoves.length; j++) {
+						if (blackPawnSpots[j]&&mouseX>blackPawn[i][0]+blackPawnMoves[j][0]&&mouseX<blackPawn[i][0]+blackPawnMoves[j][0]+width/len&&mouseY>blackPawn[i][1]+blackPawnMoves[j][1]&&mouseY<blackPawn[i][1]+blackPawnMoves[j][1]+height/len) {
+							blackPawn[i][0]+=blackPawnMoves[j][0];
+							blackPawn[i][1]+=blackPawnMoves[j][1];
+							blackPawnClicked=new boolean[blackPawnClicked.length];
+							blackKnightClicked=new boolean[blackKnightClicked.length];
+							turn=!turn;
+							break;
+						}
+					}
 				}
 			}
 			
