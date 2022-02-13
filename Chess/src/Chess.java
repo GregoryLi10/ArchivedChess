@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -67,8 +68,10 @@ public class Chess {
 				{2*width/len, height/len},
 				{width/len, 2*height/len},
 				{-width/len, 2*height/len},
-				{-2*width/len, height/len}
-		};
+				{-2*width/len, height/len}},
+				
+			whiteBishopMoves=new int[4][14]
+			;
 	
 	private boolean[] whitePawnClicked=new boolean[8], blackPawnClicked=new boolean[8],
 			whiteKnightClicked=new boolean[2], blackKnightClicked=new boolean[2];
@@ -82,7 +85,8 @@ public class Chess {
 		blackPawnImg = Toolkit.getDefaultToolkit().getImage("blackpawn.png");
 		whiteKnightImg = Toolkit.getDefaultToolkit().getImage("whiteknight.png");
 		blackKnightImg = Toolkit.getDefaultToolkit().getImage("blackknight.png");
-		for (int i=0; i<whitePawn.length; i++) {
+		whiteBishopImg = Toolkit.getDefaultToolkit().getImage("whitebishop.png");
+		for (int i=0; i<len; i++) {
 			whitePawn[i][0]=i*width/len;
 			whitePawn[i][1]=6*height/len;
 			blackPawn[i][0]=i*width/len;
@@ -93,6 +97,20 @@ public class Chess {
 			whiteKnight[i][1]=7*height/len;
 			blackKnight[i][0]=(5*i+1)*width/len;
 			blackKnight[i][1]=0;
+			whiteBishop[i][0]=(3*i+2)*width/len;
+			whiteBishop[i][1]=7*height/len;
+		}
+		for (int i=0; i<whiteBishopMoves.length; i+=2) {
+			int a;
+			if (i%2==0) a=-1;
+			else a=1;
+			for (int j=0; j<whiteBishopMoves[i].length/2; j++) {
+				whiteBishopMoves[i][2*j]=(j+1)*width/len;
+				whiteBishopMoves[i][2*j+1]=(j+1)*a*height/len;
+				whiteBishopMoves[i+1][2*j]=(j+1)*a*width/len;
+				whiteBishopMoves[i+1][2*j+1]=(j+1)*height/len;
+			}
+			System.out.println(Arrays.toString(whiteBishopMoves[i])+"\n"+Arrays.toString(whiteBishopMoves[i+1]));
 		}
 	}
 	
@@ -106,6 +124,7 @@ public class Chess {
 			g.drawLine((i+1)*width/len, 0, (i+1)*width/len, height);
 		}
 		
+		g.setColor(new Color(144, 82, 227));
 		for (int i=0; i<whitePawn.length; i++) {
 			g.drawImage(whitePawnImg, whitePawn[i][0], whitePawn[i][1], width/len, height/len, null);
 			if (!turn) continue;
@@ -148,6 +167,11 @@ public class Chess {
 						g.fillOval(blackKnight[i][0]+blackKnightMoves[j][0]+width/len*3/8, blackKnight[i][1]+blackKnightMoves[j][1]+height/len*3/8, width/len/4, height/len/4);
 				}
 			}
+		}
+		
+		for (int i=0; i<whiteBishop.length; i++) {
+			g.drawImage(whiteBishopImg, whiteBishop[i][0], whiteBishop[i][1], width/len,height/len, null);
+			if (!turn) continue;
 		}
 	}
 	
