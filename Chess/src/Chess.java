@@ -23,7 +23,7 @@ public class Chess {
 	
 	private int width = 400, height = 400, textHeight = 50;
 	
-	private Image whitePawnImg, blackPawnImg, whiteKnightImg, blackKnightImg, whiteBishopImg, blackBishopImg, whiteRookImg, blackRookImg, whiteQueenImg, blackQueenImg, whiteKingImg;
+	private Image whitePawnImg, blackPawnImg, whiteKnightImg, blackKnightImg, whiteBishopImg, blackBishopImg, whiteRookImg, blackRookImg, whiteQueenImg, blackQueenImg, whiteKingImg, blackKingImg;
 	
 	private final int len=8;
 	
@@ -70,18 +70,37 @@ public class Chess {
 				
 			whiteBishopMoves=new int[4][14], blackBishopMoves=new int[4][14],
 			whiteRookMoves=new int[4][14], blackRookMoves=new int[4][14],
-			whiteQueenMoves=new int[8][14], blackQueenMoves=new int[8][14]
-			;
+			whiteQueenMoves=new int[8][14], blackQueenMoves=new int[8][14],
+			whiteKingMoves= {
+				{-width/len, 0},
+				{-width/len, -height/len},
+				{0, -height/len},
+				{width/len, -height/len},
+				{width/len, 0},
+				{-width/len, -height/len},
+				{0, -height/len},
+				{width/len, -height/len}},
+			
+			blackKingMoves={
+				{-width/len, 0},
+				{-width/len, -height/len},
+				{0, -height/len},
+				{width/len, -height/len},
+				{width/len, 0},
+				{-width/len, -height/len},
+				{0, -height/len},
+				{width/len, -height/len}};
 	
 	private boolean[] whitePawnClicked=new boolean[8], blackPawnClicked=new boolean[8],
 			whiteKnightClicked=new boolean[2], blackKnightClicked=new boolean[2],
 			whiteBishopClicked=new boolean[2], blackBishopClicked=new boolean[2],
 			whiteRookClicked=new boolean[2], blackRookClicked=new boolean[2];
 	
-	private boolean whiteQueenClicked, blackQueenClicked;
+	private boolean whiteQueenClicked, blackQueenClicked, whiteKingClicked, blackKingClicked;
 	
 	private boolean[] whitePawnSpots=new boolean[4], blackPawnSpots=new boolean[4], 
-			whiteKnightSpots=new boolean[8], blackKnightSpots=new boolean[8];
+			whiteKnightSpots=new boolean[8], blackKnightSpots=new boolean[8],
+			whiteKingSpots=new boolean[8], blackKingSpots=new boolean[8];
 	
 	private boolean[][]whiteBishopSpots=new boolean[4][7], blackBishopSpots=new boolean[4][7],
 			whiteRookSpots=new boolean[4][7], blackRookSpots=new boolean[4][7],
@@ -98,6 +117,8 @@ public class Chess {
 		blackRookImg = Toolkit.getDefaultToolkit().getImage("blackrook.png");
 		whiteQueenImg = Toolkit.getDefaultToolkit().getImage("whitequeen.png");
 		blackQueenImg = Toolkit.getDefaultToolkit().getImage("blackqueen.png");
+		whiteKingImg = Toolkit.getDefaultToolkit().getImage("whiteking.png");
+		blackKingImg = Toolkit.getDefaultToolkit().getImage("blackking.png");
 		for (int i=0; i<len; i++) {
 			whitePawn[i][0]=i*width/len;
 			whitePawn[i][1]=6*height/len;
@@ -118,6 +139,9 @@ public class Chess {
 		whiteQueen[0][0]=3*width/len;
 		whiteQueen[0][1]=7*height/len;
 		blackQueen[0][0]=3*width/len;
+		whiteKing[0][0]=4*width/len;
+		whiteKing[0][1]=7*height/len;
+		blackKing[0][0]=4*width/len;
 		
 		for (int i=0; i<whiteBishopMoves.length; i+=2) {
 			int a=i==0?1:-1;
@@ -294,6 +318,14 @@ public class Chess {
 				}
 			}
 		}
+		
+		g.drawImage(whiteKingImg, whiteKing[0][0], whiteKing[0][1], width/len,height/len, null);
+		if (whiteKingClicked&&turn) {
+			for (int j=0; j<whiteKingSpots.length; j++) {
+					if (whiteKingSpots[j])
+					g.fillOval(whiteKing[0][0]+whiteKingMoves[j][0]+width/len*3/8, whiteKing[0][1]+whiteKingMoves[j][1]+height/len*3/8, width/len/4, height/len/4);
+			}
+		}
 	}
 	
 	public boolean in(int mx, int my, int ox, int oy) {
@@ -311,6 +343,8 @@ public class Chess {
 		blackRookClicked=new boolean[blackRookClicked.length];
 		whiteQueenClicked=false;
 		blackQueenClicked=false;
+		whiteKingClicked=false;
+		blackKingClicked=false;
 	}
 	
 	public boolean checkWhite(int x, int y) {
@@ -328,6 +362,7 @@ public class Chess {
 			if (whiteRook[i][0]==x&&whiteRook[i][1]==y) return false;
 		}
 		if (whiteQueen[0][0]==x&&whiteQueen[0][1]==y) return false;
+		if (whiteKing[0][0]==x&&whiteKing[0][1]==y) return false;
 		return true;
 	}
 	
@@ -345,6 +380,7 @@ public class Chess {
 			if (blackRook[i][0]==x&&blackRook[i][1]==y) return false;
 		}
 		if (blackQueen[0][0]==x&&blackQueen[0][1]==y) return false;
+		if (blackKing[0][0]==x&&blackKing[0][1]==y) return false;
 		return true;
 	}
 	
@@ -376,7 +412,7 @@ public class Chess {
 			}
 			
 			for (int i=0; i<whiteKnight.length; i++) {
-				if (mouseX>whiteKnight[i][0]&&mouseX<whiteKnight[i][0]+width/len&&mouseY>whiteKnight[i][1]&&mouseY<whiteKnight[i][1]+height/len) {
+				if (in(mouseX, mouseY, whiteKnight[i][0], whiteKnight[i][1])) {
 					resetSelected();
 					whiteKnightClicked[i]=true;
 					whiteKnightSpots=new boolean[whiteKnightSpots.length];
@@ -499,6 +535,28 @@ public class Chess {
 							resetSelected();
 							turn=!turn;
 						}
+					}
+				}
+			}
+			
+			if (in(mouseX, mouseY, whiteKing[0][0], whiteKing[0][1])) {
+				resetSelected();
+				whiteKingClicked=true;
+				whiteKingSpots=new boolean[whiteKingSpots.length];
+				for (int j=0; j<whiteKingMoves.length; j++) {
+					whiteKingSpots[j]=checkWhite(whiteKing[0][0]+whiteKingMoves[j][0], whiteKing[0][1]+whiteKingMoves[j][1]);
+				}
+			}
+			
+			else if (whiteKingClicked) {
+				for (int j=0; j<whiteKingMoves.length; j++) {
+					if (!whiteKingSpots[j]) continue;
+					if (in(mouseX, mouseY, whiteKing[0][0]+whiteKingMoves[j][0], whiteKing[0][1]+whiteKingMoves[j][1])){
+						whiteKing[0][0]+=whiteKingMoves[j][0];
+						whiteKing[0][1]+=whiteKingMoves[j][1];
+						resetSelected();
+						turn=!turn;
+						break;
 					}
 				}
 			}
