@@ -77,9 +77,9 @@ public class Chess {
 				{0, -height/len},
 				{width/len, -height/len},
 				{width/len, 0},
-				{-width/len, -height/len},
-				{0, -height/len},
-				{width/len, -height/len}},
+				{width/len, height/len},
+				{0, height/len},
+				{-width/len, height/len}},
 			
 			blackKingMoves={
 				{-width/len, 0},
@@ -87,9 +87,9 @@ public class Chess {
 				{0, -height/len},
 				{width/len, -height/len},
 				{width/len, 0},
-				{-width/len, -height/len},
-				{0, -height/len},
-				{width/len, -height/len}};
+				{width/len, height/len},
+				{0, height/len},
+				{-width/len, height/len}};
 	
 	private boolean[] whitePawnClicked=new boolean[8], blackPawnClicked=new boolean[8],
 			whiteKnightClicked=new boolean[2], blackKnightClicked=new boolean[2],
@@ -118,7 +118,7 @@ public class Chess {
 		whiteQueenImg = Toolkit.getDefaultToolkit().getImage("whitequeen.png");
 		blackQueenImg = Toolkit.getDefaultToolkit().getImage("blackqueen.png");
 		whiteKingImg = Toolkit.getDefaultToolkit().getImage("whiteking.png");
-		blackKingImg = Toolkit.getDefaultToolkit().getImage("blackking.png");
+		blackKingImg = Toolkit.getDefaultToolkit().getImage("blacking.png");
 		for (int i=0; i<len; i++) {
 			whitePawn[i][0]=i*width/len;
 			whitePawn[i][1]=6*height/len;
@@ -327,12 +327,12 @@ public class Chess {
 			}
 		}
 		
-//		g.fillOval(blackKing[0][0], blackKing[0][1], width/len,height/len);
-		g.drawImage(blackKingImg, blackKing[0][0], blackKing[0][1], width/len,height/len, null);
+		g.drawImage(blackKingImg, blackKing[0][0], blackKing[0][1], width/len, height/len, null);
 		if (blackKingClicked&&!turn) {
 			for (int j=0; j<blackKingSpots.length; j++) {
-					if (blackKingSpots[j]) 
-						g.fillOval(blackKing[0][0]+blackKingMoves[j][0]+width/len*3/8, blackKing[0][1]+blackKingMoves[j][1]+height/len*3/8, width/len/4, height/len/4);
+				if (blackKingSpots[j]) {
+					g.fillOval(blackKing[0][0]+blackKingMoves[j][0]+width/len*3/8, blackKing[0][1]+blackKingMoves[j][1]+height/len*3/8, width/len/4, height/len/4);
+				}
 			}
 		}
 	}
@@ -729,6 +729,8 @@ public class Chess {
 				blackKingSpots=new boolean[blackKingSpots.length];
 				for (int j=0; j<blackKingMoves.length; j++) {
 					blackKingSpots[j]=checkBlack(blackKing[0][0]+blackKingMoves[j][0], blackKing[0][1]+blackKingMoves[j][1]);
+					if (blackKing[0][0]+blackKingMoves[j][0]<0||blackKing[0][0]+blackKingMoves[j][0]>=width||blackKing[0][1]+blackKingMoves[j][1]<0||blackKing[0][1]+blackKingMoves[j][1]>=height)
+						blackKingSpots[j]=false;
 				}
 			}
 			
