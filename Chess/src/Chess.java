@@ -144,6 +144,10 @@ public class Chess {
 					whiteQueenMoves[i][2*j+1]=(j+1)*height/len;
 					whiteQueenMoves[i+1][2*j]=-whiteQueenMoves[i][2*j];
 					whiteQueenMoves[i+1][2*j+1]=-whiteQueenMoves[i][2*j+1];
+					blackQueenMoves[i][2*j]=(j+1)*a*width/len;
+					blackQueenMoves[i][2*j+1]=(j+1)*height/len;
+					blackQueenMoves[i+1][2*j]=-blackQueenMoves[i][2*j];
+					blackQueenMoves[i+1][2*j+1]=-blackQueenMoves[i][2*j+1];
 				}
 			}
 			else {
@@ -152,6 +156,10 @@ public class Chess {
 					whiteQueenMoves[i][2*j+1]=0;
 					whiteQueenMoves[i+1][2*j]=0;
 					whiteQueenMoves[i+1][2*j+1]=(j+1)*a*height/len;
+					blackQueenMoves[i][2*j]=(j+1)*a*width/len;
+					blackQueenMoves[i][2*j+1]=0;
+					blackQueenMoves[i+1][2*j]=0;
+					blackQueenMoves[i+1][2*j+1]=(j+1)*a*height/len;
 				}
 			}
 		}
@@ -268,24 +276,24 @@ public class Chess {
 		}
 		
 		g.drawImage(whiteQueenImg, whiteQueen[0][0], whiteQueen[0][1], width/len,height/len, null);
-//		if (whiteQueenClicked&&turn) {
-//			for (int j=0; j<whiteQueenSpots.length; j++) {
-//				for (int k=0; k<whiteQueenSpots[j].length; k++) {
-//					if (whiteRookSpots[j][k])
-//						g.fillOval(whiteQueen[0][0]+whiteQueenMoves[j][2*k]+width/len*3/8, whiteQueen[0][1]+whiteQueenMoves[j][2*k+1]+height/len*3/8, width/len/4, height/len/4);
-//				}
-//			}
-//		}
+		if (whiteQueenClicked&&turn) {
+			for (int j=0; j<whiteQueenSpots.length; j++) {
+				for (int k=0; k<whiteQueenSpots[j].length; k++) {
+					if (whiteQueenSpots[j][k])
+						g.fillOval(whiteQueen[0][0]+whiteQueenMoves[j][2*k]+width/len*3/8, whiteQueen[0][1]+whiteQueenMoves[j][2*k+1]+height/len*3/8, width/len/4, height/len/4);
+				}
+			}
+		}
 		
 		g.drawImage(blackQueenImg, blackQueen[0][0], blackQueen[0][1], width/len,height/len, null);
-//		if (blackQueenClicked&&!turn) {
-//			for (int j=0; j<blackQueenSpots.length; j++) {
-//				for (int k=0; k<blackQueenSpots[j].length; k++) {
-//					if (blackRookSpots[j][k])
-//						g.fillOval(blackQueen[0][0]+blackQueenMoves[j][2*k]+width/len*3/8, blackQueen[0][1]+blackQueenMoves[j][2*k+1]+height/len*3/8, width/len/4, height/len/4);
-//				}
-//			}
-//		}
+		if (blackQueenClicked&&!turn) {
+			for (int j=0; j<blackQueenSpots.length; j++) {
+				for (int k=0; k<blackQueenSpots[j].length; k++) {
+					if (blackQueenSpots[j][k])
+						g.fillOval(blackQueen[0][0]+blackQueenMoves[j][2*k]+width/len*3/8, blackQueen[0][1]+blackQueenMoves[j][2*k+1]+height/len*3/8, width/len/4, height/len/4);
+				}
+			}
+		}
 	}
 	
 	public boolean in(int mx, int my, int ox, int oy) {
@@ -460,6 +468,40 @@ public class Chess {
 					}
 				}
 			}
+			
+			if (in(mouseX, mouseY, whiteQueen[0][0], whiteQueen[0][1])) {
+				resetSelected();
+				whiteQueenClicked=true;
+				whiteQueenSpots=new boolean[whiteQueenSpots.length][whiteQueenSpots[0].length];
+				for (int j=0; j<whiteQueenSpots.length; j++) {
+					for (int k=0; k<whiteQueenSpots[j].length; k++) {
+						if (whiteQueen[0][0]+whiteQueenMoves[j][2*k]>=width||whiteQueen[0][0]+whiteQueenMoves[j][2*k]<0||whiteQueen[0][1]+whiteQueenMoves[j][2*k+1]>=height||whiteQueen[0][1]+whiteQueenMoves[j][2*k+1]<0) {
+							whiteQueenSpots[j][k]=false; break;
+						}
+						whiteQueenSpots[j][k]=checkWhite(whiteQueen[0][0]+whiteQueenMoves[j][2*k], whiteQueen[0][1]+whiteQueenMoves[j][2*k+1]);
+						if (!whiteQueenSpots[j][k]) break;
+						whiteQueenSpots[j][k]=checkBlack(whiteQueen[0][0]+whiteQueenMoves[j][2*k], whiteQueen[0][1]+whiteQueenMoves[j][2*k+1]);
+						if (!whiteQueenSpots[j][k]) {
+							whiteQueenSpots[j][k]=true;
+							break;
+						}
+					}
+				}
+			}
+			
+			else if (whiteQueenClicked) {
+				for (int j=0; j<whiteQueenSpots.length; j++) {
+					for (int k=0; k<whiteQueenSpots[j].length; k++) {
+						if (!whiteQueenSpots[j][k]) break;
+						if (in(mouseX, mouseY, whiteQueen[0][0]+whiteQueenMoves[j][2*k], whiteQueen[0][1]+whiteQueenMoves[j][2*k+1])) {
+							whiteQueen[0][0]+=whiteQueenMoves[j][2*k];
+							whiteQueen[0][1]+=whiteQueenMoves[j][2*k+1];
+							resetSelected();
+							turn=!turn;
+						}
+					}
+				}
+			}
 		}
 		
 		else { //black to move
@@ -580,7 +622,39 @@ public class Chess {
 				}
 			}
 			
+			if (in(mouseX, mouseY, blackQueen[0][0], blackQueen[0][1])) {
+				resetSelected();
+				blackQueenClicked=true;
+				blackQueenSpots=new boolean[blackQueenSpots.length][blackQueenSpots[0].length];
+				for (int j=0; j<blackQueenSpots.length; j++) {
+					for (int k=0; k<blackQueenSpots[j].length; k++) {
+						if (blackQueen[0][0]+blackQueenMoves[j][2*k]>=width||blackQueen[0][0]+blackQueenMoves[j][2*k]<0||blackQueen[0][1]+blackQueenMoves[j][2*k+1]>=height||blackQueen[0][1]+blackQueenMoves[j][2*k+1]<0) {
+							blackQueenSpots[j][k]=false; break;
+						}
+						blackQueenSpots[j][k]=checkBlack(blackQueen[0][0]+blackQueenMoves[j][2*k], blackQueen[0][1]+blackQueenMoves[j][2*k+1]);
+						if (!blackQueenSpots[j][k]) break;
+						blackQueenSpots[j][k]=checkWhite(blackQueen[0][0]+blackQueenMoves[j][2*k], blackQueen[0][1]+blackQueenMoves[j][2*k+1]);
+						if (!blackQueenSpots[j][k]) {
+							blackQueenSpots[j][k]=true;
+							break;
+						}
+					}
+				}
+			}
 			
+			else if (blackQueenClicked) {
+				for (int j=0; j<blackQueenSpots.length; j++) {
+					for (int k=0; k<blackQueenSpots[j].length; k++) {
+						if (!blackQueenSpots[j][k]) break;
+						if (in(mouseX, mouseY, blackQueen[0][0]+blackQueenMoves[j][2*k], blackQueen[0][1]+blackQueenMoves[j][2*k+1])) {
+							blackQueen[0][0]+=blackQueenMoves[j][2*k];
+							blackQueen[0][1]+=blackQueenMoves[j][2*k+1];
+							resetSelected();
+							turn=!turn;
+						}
+					}
+				}
+			}
 		}
 	}
 	
