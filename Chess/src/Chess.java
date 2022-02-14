@@ -23,9 +23,7 @@ public class Chess {
 	
 	private int width = 400, height = 400, textHeight = 50;
 	
-	private int score = 0;
-	
-	private Image whitePawnImg, blackPawnImg, whiteKnightImg, blackKnightImg, whiteBishopImg, blackBishopImg, whiteRookImg, blackRookImg, whiteQueenImg, whiteKingImg;
+	private Image whitePawnImg, blackPawnImg, whiteKnightImg, blackKnightImg, whiteBishopImg, blackBishopImg, whiteRookImg, blackRookImg, whiteQueenImg, blackQueenImg, whiteKingImg;
 	
 	private final int len=8;
 	
@@ -71,7 +69,8 @@ public class Chess {
 				{-2*width/len, height/len}},
 				
 			whiteBishopMoves=new int[4][14], blackBishopMoves=new int[4][14],
-			whiteRookMoves=new int[4][14], blackRookMoves=new int[4][14]
+			whiteRookMoves=new int[4][14], blackRookMoves=new int[4][14],
+			whiteQueenMoves=new int[8][14], blackQueenMoves=new int[8][14]
 			;
 	
 	private boolean[] whitePawnClicked=new boolean[8], blackPawnClicked=new boolean[8],
@@ -79,11 +78,14 @@ public class Chess {
 			whiteBishopClicked=new boolean[2], blackBishopClicked=new boolean[2],
 			whiteRookClicked=new boolean[2], blackRookClicked=new boolean[2];
 	
+	private boolean whiteQueenClicked, blackQueenClicked;
+	
 	private boolean[] whitePawnSpots=new boolean[4], blackPawnSpots=new boolean[4], 
 			whiteKnightSpots=new boolean[8], blackKnightSpots=new boolean[8];
 	
 	private boolean[][]whiteBishopSpots=new boolean[4][7], blackBishopSpots=new boolean[4][7],
-			whiteRookSpots=new boolean[4][7], blackRookSpots=new boolean[4][7];
+			whiteRookSpots=new boolean[4][7], blackRookSpots=new boolean[4][7],
+			whiteQueenSpots=new boolean[8][7], blackQueenSpots=new boolean[8][7];
 	
 	public void set() {
 		whitePawnImg = Toolkit.getDefaultToolkit().getImage("whitepawn.png");
@@ -94,6 +96,8 @@ public class Chess {
 		blackBishopImg = Toolkit.getDefaultToolkit().getImage("blackbishop.png");
 		whiteRookImg = Toolkit.getDefaultToolkit().getImage("whiterook.png");
 		blackRookImg = Toolkit.getDefaultToolkit().getImage("blackrook.png");
+		whiteQueenImg = Toolkit.getDefaultToolkit().getImage("whitequeen.png");
+		blackQueenImg = Toolkit.getDefaultToolkit().getImage("blackqueen.png");
 		for (int i=0; i<len; i++) {
 			whitePawn[i][0]=i*width/len;
 			whitePawn[i][1]=6*height/len;
@@ -104,14 +108,17 @@ public class Chess {
 			whiteKnight[i][0]=(5*i+1)*width/len;
 			whiteKnight[i][1]=7*height/len;
 			blackKnight[i][0]=(5*i+1)*width/len;
-			blackKnight[i][1]=0;
 			whiteBishop[i][0]=(3*i+2)*width/len;
 			whiteBishop[i][1]=7*height/len;
 			blackBishop[i][0]=(3*i+2)*width/len;
-			blackBishop[i][1]=0;
 			whiteRook[i][0]=7*i*width/len;
 			whiteRook[i][1]=7*height/len;
+			blackRook[i][0]=7*i*width/len;
 		}
+		whiteQueen[0][0]=3*width/len;
+		whiteQueen[0][1]=7*height/len;
+		blackQueen[0][0]=3*width/len;
+		
 		for (int i=0; i<whiteBishopMoves.length; i+=2) {
 			int a=i==0?1:-1;
 			for (int j=0; j<whiteBishopMoves[i].length/2; j++) {
@@ -124,13 +131,28 @@ public class Chess {
 				blackBishopMoves[i+1][2*j]=-blackBishopMoves[i][2*j];
 				blackBishopMoves[i+1][2*j+1]=-blackBishopMoves[i][2*j+1];
 				whiteRookMoves[i][2*j]=(j+1)*a*width/len;
-				whiteRookMoves[i][2*j+1]=0;
-				whiteRookMoves[i+1][2*j]=0;
 				whiteRookMoves[i+1][2*j+1]=(j+1)*a*height/len;
 				blackRookMoves[i][2*j]=(j+1)*a*width/len;
-				blackRookMoves[i][2*j+1]=0;
-				blackRookMoves[i+1][2*j]=0;
 				blackRookMoves[i+1][2*j+1]=(j+1)*a*height/len;
+			}
+		}
+		for (int i=0; i<whiteQueenMoves.length; i+=2) {
+			int a=i%4==0?1:-1;
+			if (i<4) {
+				for (int j=0; j<whiteQueenMoves[i].length/2; j++) {
+					whiteQueenMoves[i][2*j]=(j+1)*a*width/len;
+					whiteQueenMoves[i][2*j+1]=(j+1)*height/len;
+					whiteQueenMoves[i+1][2*j]=-whiteQueenMoves[i][2*j];
+					whiteQueenMoves[i+1][2*j+1]=-whiteQueenMoves[i][2*j+1];
+				}
+			}
+			else {
+				for (int j=0; j<whiteQueenMoves[i].length/2; j++) {
+					whiteQueenMoves[i][2*j]=(j+1)*a*width/len;
+					whiteQueenMoves[i][2*j+1]=0;
+					whiteQueenMoves[i+1][2*j]=0;
+					whiteQueenMoves[i+1][2*j+1]=(j+1)*a*height/len;
+				}
 			}
 		}
 	}
@@ -140,6 +162,9 @@ public class Chess {
 	}
 	
 	public void draw(Graphics g) {
+		g.setColor(new Color(200,200,200));
+		g.fillRect(0, 0, width, height);
+		g.setColor(Color.black);
 		for (int i=0; i<len; i++) {
 			g.drawLine(0, (i+1)*height/len, width, (i+1)*height/len);
 			g.drawLine((i+1)*width/len, 0, (i+1)*width/len, height);
@@ -231,7 +256,7 @@ public class Chess {
 		
 		for (int i=0; i<blackRook.length; i++) {
 			g.drawImage(blackRookImg, blackRook[i][0], blackRook[i][1], width/len,height/len, null);
-			if (!turn) continue;
+			if (turn) continue;
 			if (blackRookClicked[i]) {
 				for (int j=0; j<blackRookSpots.length; j++) {
 					for (int k=0; k<blackRookSpots[j].length; k++) {
@@ -241,6 +266,26 @@ public class Chess {
 				}
 			}
 		}
+		
+		g.drawImage(whiteQueenImg, whiteQueen[0][0], whiteQueen[0][1], width/len,height/len, null);
+//		if (whiteQueenClicked&&turn) {
+//			for (int j=0; j<whiteQueenSpots.length; j++) {
+//				for (int k=0; k<whiteQueenSpots[j].length; k++) {
+//					if (whiteRookSpots[j][k])
+//						g.fillOval(whiteQueen[0][0]+whiteQueenMoves[j][2*k]+width/len*3/8, whiteQueen[0][1]+whiteQueenMoves[j][2*k+1]+height/len*3/8, width/len/4, height/len/4);
+//				}
+//			}
+//		}
+		
+		g.drawImage(blackQueenImg, blackQueen[0][0], blackQueen[0][1], width/len,height/len, null);
+//		if (blackQueenClicked&&!turn) {
+//			for (int j=0; j<blackQueenSpots.length; j++) {
+//				for (int k=0; k<blackQueenSpots[j].length; k++) {
+//					if (blackRookSpots[j][k])
+//						g.fillOval(blackQueen[0][0]+blackQueenMoves[j][2*k]+width/len*3/8, blackQueen[0][1]+blackQueenMoves[j][2*k+1]+height/len*3/8, width/len/4, height/len/4);
+//				}
+//			}
+//		}
 	}
 	
 	public boolean in(int mx, int my, int ox, int oy) {
@@ -256,6 +301,8 @@ public class Chess {
 		blackBishopClicked=new boolean[blackBishopClicked.length];
 		whiteRookClicked=new boolean[whiteRookClicked.length];
 		blackRookClicked=new boolean[blackRookClicked.length];
+		whiteQueenClicked=false;
+		blackQueenClicked=false;
 	}
 	
 	public boolean checkWhite(int x, int y) {
@@ -269,6 +316,10 @@ public class Chess {
 		for (int i=0; i<whiteBishop.length; i++) {
 			if (whiteBishop[i][0]==x&&whiteBishop[i][1]==y) return false;
 		}
+		for (int i=0; i<whiteRook.length; i++) {
+			if (whiteRook[i][0]==x&&whiteRook[i][1]==y) return false;
+		}
+		if (whiteQueen[0][0]==x&&whiteQueen[0][1]==y) return false;
 		return true;
 	}
 	
@@ -282,6 +333,10 @@ public class Chess {
 		for (int i=0; i<blackBishop.length; i++) {
 			if (blackBishop[i][0]==x&&blackBishop[i][1]==y) return false;
 		}
+		for (int i=0; i<blackRook.length; i++) {
+			if (blackRook[i][0]==x&&blackRook[i][1]==y) return false;
+		}
+		if (blackQueen[0][0]==x&&blackQueen[0][1]==y) return false;
 		return true;
 	}
 	
@@ -377,6 +432,9 @@ public class Chess {
 					whiteRookSpots=new boolean[whiteRookSpots.length][whiteRookSpots[0].length];
 					for (int j=0; j<whiteRookSpots.length; j++) {
 						for (int k=0; k<whiteRookSpots[j].length; k++) {
+							if (whiteRook[i][0]+whiteRookMoves[j][2*k]>=width||whiteRook[i][0]+whiteRookMoves[j][2*k]<0||whiteRook[i][1]+whiteRookMoves[j][2*k+1]>=height||whiteRook[i][1]+whiteRookMoves[j][2*k+1]<0) {
+								whiteRookSpots[j][k]=false; break;
+							}
 							whiteRookSpots[j][k]=checkWhite(whiteRook[i][0]+whiteRookMoves[j][2*k], whiteRook[i][1]+whiteRookMoves[j][2*k+1]);
 							if (!whiteRookSpots[j][k]) break;
 							whiteRookSpots[j][k]=checkBlack(whiteRook[i][0]+whiteRookMoves[j][2*k], whiteRook[i][1]+whiteRookMoves[j][2*k+1]);
@@ -486,6 +544,41 @@ public class Chess {
 				}
 			}
 			
+			for (int i=0; i<blackRook.length; i++) {
+				if (in(mouseX, mouseY, blackRook[i][0], blackRook[i][1])) {
+					resetSelected();
+					blackRookClicked[i]=true;
+					blackRookSpots=new boolean[blackRookSpots.length][blackRookSpots[0].length];
+					for (int j=0; j<blackRookSpots.length; j++) {
+						for (int k=0; k<blackRookSpots[j].length; k++) {
+							if (blackRook[i][0]+blackRookMoves[j][2*k]>=width||blackRook[i][0]+blackRookMoves[j][2*k]<0||blackRook[i][1]+blackRookMoves[j][2*k+1]>=height||blackRook[i][1]+blackRookMoves[j][2*k+1]<0) {
+								blackRookSpots[j][k]=false; break;
+							}
+							blackRookSpots[j][k]=checkBlack(blackRook[i][0]+blackRookMoves[j][2*k], blackRook[i][1]+blackRookMoves[j][2*k+1]);
+							if (!blackRookSpots[j][k]) break;
+							blackRookSpots[j][k]=checkWhite(blackRook[i][0]+blackRookMoves[j][2*k], blackRook[i][1]+blackRookMoves[j][2*k+1]);
+							if (!blackRookSpots[j][k]) {
+								blackRookSpots[j][k]=true;
+								break;
+							}
+						}
+					}
+				}
+				
+				else if (blackRookClicked[i]) {
+					for (int j=0; j<blackRookSpots.length; j++) {
+						for (int k=0; k<blackRookSpots[j].length; k++) {
+							if (!blackRookSpots[j][k]) break;
+							if (in(mouseX, mouseY, blackRook[i][0]+blackRookMoves[j][2*k], blackRook[i][1]+blackRookMoves[j][2*k+1])) {
+								blackRook[i][0]+=blackRookMoves[j][2*k];
+								blackRook[i][1]+=blackRookMoves[j][2*k+1];
+								resetSelected();
+								turn=!turn;
+							}
+						}
+					}
+				}
+			}
 			
 			
 		}
