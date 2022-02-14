@@ -326,6 +326,15 @@ public class Chess {
 					g.fillOval(whiteKing[0][0]+whiteKingMoves[j][0]+width/len*3/8, whiteKing[0][1]+whiteKingMoves[j][1]+height/len*3/8, width/len/4, height/len/4);
 			}
 		}
+		
+//		g.fillOval(blackKing[0][0], blackKing[0][1], width/len,height/len);
+		g.drawImage(blackKingImg, blackKing[0][0], blackKing[0][1], width/len,height/len, null);
+		if (blackKingClicked&&!turn) {
+			for (int j=0; j<blackKingSpots.length; j++) {
+					if (blackKingSpots[j]) 
+						g.fillOval(blackKing[0][0]+blackKingMoves[j][0]+width/len*3/8, blackKing[0][1]+blackKingMoves[j][1]+height/len*3/8, width/len/4, height/len/4);
+			}
+		}
 	}
 	
 	public boolean in(int mx, int my, int ox, int oy) {
@@ -710,6 +719,28 @@ public class Chess {
 							resetSelected();
 							turn=!turn;
 						}
+					}
+				}
+			}
+			
+			if (in(mouseX, mouseY, blackKing[0][0], blackKing[0][1])) {
+				resetSelected();
+				blackKingClicked=true;
+				blackKingSpots=new boolean[blackKingSpots.length];
+				for (int j=0; j<blackKingMoves.length; j++) {
+					blackKingSpots[j]=checkBlack(blackKing[0][0]+blackKingMoves[j][0], blackKing[0][1]+blackKingMoves[j][1]);
+				}
+			}
+			
+			else if (blackKingClicked) {
+				for (int j=0; j<blackKingMoves.length; j++) {
+					if (!blackKingSpots[j]) continue;
+					if (in(mouseX, mouseY, blackKing[0][0]+blackKingMoves[j][0], blackKing[0][1]+blackKingMoves[j][1])){
+						blackKing[0][0]+=blackKingMoves[j][0];
+						blackKing[0][1]+=blackKingMoves[j][1];
+						resetSelected();
+						turn=!turn;
+						break;
 					}
 				}
 			}
